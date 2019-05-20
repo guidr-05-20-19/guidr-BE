@@ -1,7 +1,7 @@
 // require('dotenv').config();
 const axios = require("axios");
 const bcrypt = require("bcryptjs");
-const Users = require("../users/users-model.js");
+const Users = require("../helpers/users-model.js");
 const secrets = require("../config/secrets.js");
 const jwt = require("jsonwebtoken");
 
@@ -12,8 +12,17 @@ const { authenticate } = require("../auth/authenticate");
 module.exports = server => {
   server.post("/api/register", register);
   server.post("/api/login", login);
-  server.get("/api/jokes", authenticate, getJokes);
+  server.get("/users", getTest);
+//   server.get("/api/jokes", authenticate, getJokes);
 };
+
+function getTest(req, res) {
+    Users.find()
+      .then(users => {
+        res.json(users);
+      })
+      .catch(err => res.send(err));
+  };
 
 function register(req, res) {
   let user = req.body;
