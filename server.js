@@ -15,7 +15,7 @@ configureTripRoutes(server);
 
 // server test
 server.get('/', (req, res) => {
-    res.send('I\'m alive?')
+    res.send('Hello Azra and Hung!!')
   });
   
   
