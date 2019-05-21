@@ -22,7 +22,7 @@ const getAllTrips = (req, res) => {
     });
 }
 
-const getTripById = (req, res) => {
+const getTripsById = (req, res) => {
   dbTrips.get(req.params.id)
     .then(post => {
       console.log(post)
