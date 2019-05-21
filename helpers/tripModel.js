@@ -1,13 +1,13 @@
-const db = require('../config/dbConfig');
-const mappers = require('./mappers');
+const db = require("../config/dbConfig");
+const mappers = require("./mappers");
 
 module.exports = {
-  get: function (id) {
-    let query = db('trips');
+  get: function(id) {
+    let query = db("trips");
 
     if (id) {
       return query
-        .where('id', id)
+        .where("id", id)
         .first()
         .then(trip => mappers.tripToBody(trip)); // s
     }
@@ -16,20 +16,20 @@ module.exports = {
       return trips.map(trip => mappers.tripToBody(trip)); //s
     });
   },
-  insert: function (trip) {
-    return db('trips')
+  insert: function(trip) {
+    return db("trips")
       .insert(trip)
       .then(([id]) => this.get(id));
   },
-  update: function (id, changes) {
-    return db('trips')
-      .where('id', id)
+  update: function(id, changes) {
+    return db("trips")
+      .where("id", id)
       .update(changes)
       .then(count => (count > 0 ? this.get(id) : null));
   },
-  remove: function (id) {
-    return db('trips')
-      .where('id', id)
+  remove: function(id) {
+    return db("trips")
+      .where("id", id)
       .del();
-  },
+  }
 };
