@@ -1,89 +1,72 @@
-// require('dotenv').config();
-const axios = require("axios");
-const bcrypt = require("bcryptjs");
-const Users = require("../helpers/users-model.js");
-const secrets = require("../config/secrets.js");
-const jwt = require("jsonwebtoken");
+require('dotenv').config();
+const axios = require('axios');
+const bcrypt = require('bcryptjs');
+const db = require('./dbConfig');
+const jwt = require('jsonwebtoken');
+const hashPassword = require('../helpers/hashPassword');
 
 
 
-const { authenticate } = require("../auth/authenticate");
+const { authenticate } = require('../auth/authenticate');
+
 
 module.exports = server => {
-  server.post("/api/register", register);
-  server.post("/api/login", login);
-  server.get("/users", getTest);
-//   server.get("/api/jokes", authenticate, getJokes);
+  server.post('/register', register);
+  server.post('/login', login);
+  server.get('/trips', authenticate);
+  // server.get('/trips', authenticate, getGuidr);  
 };
 
-function getTest(req, res) {
-    Users.find()
-      .then(users => {
-        res.json(users);
-      })
-      .catch(err => res.send(err));
-  };
+
+
 
 function register(req, res) {
-  let user = req.body;
-  const hash = bcrypt.hashSync(user.password, 8);
-  user.password = hash;
+  // implement user registration
+  const userInfo = req.body;
 
-  Users.add(user)
-    .then(saved => {
-      res.status(201).json(saved);
+  const hash = hashPassword(userInfo.password);
+
+  userInfo.password = hash;
+
+  db('users')
+    .insert(userInfo)
+    .then(ids => {
+      res.status(201).json(ids);
     })
-    .catch(error => {
-      res.status(500).json(error);
-    });
-}
-
-function login(req, res) {
-  let { username, password } = req.body;
-
-  Users.findBy({ username })
-    .first()
-    .then(user => {
-      if (user && bcrypt.compareSync(password, user.password)) {
-        const token = generateToken(user);
-
-        res.status(200).json({
-          message: `Welcome ${
-            user.username
-          }!, here is a token, proceed with caution for terrible things lie ahead...`,
-          token
-        });
-      } else {
-        res.status(401).json({ message: "Access Denied!" });
-      }
-    })
-    .catch(err => {
-      res.status(500).json(err);
-    });
+    .catch(err => res.status(500).json(err));
 }
 
 function generateToken(user) {
   const payload = {
-    subject: user.id,
-    username: user.username
+    username: user.username,
   };
+
+  const secret = process.env.JWT_SECRET;
+
   const options = {
-    expiresIn: "1d"
+    expiresIn: '1d',
   };
-  return jwt.sign(payload, secrets.jwtKey, options);
+
+  return jwt.sign(payload, secret, options);
 }
 
-// function getJokes(req, res) {
-//   const requestOptions = {
-//     headers: { accept: "application/json" }
-//   };
+function login(req, res) {
+  // implement user login
+  const creds = req.body;
 
-//   axios
-//     .get("https://icanhazdadjoke.com/search", requestOptions)
-//     .then(response => {
-//       res.status(200).json(response.data.results);
-//     })
-//     .catch(err => {
-//       res.status(500).json({ message: "Error Fetching Jokes", error: err });
-//     });
-// }
+  db('users')
+    .where({ username: creds.username })
+    .first()
+    .then(user => {
+      if (user && bcrypt.compareSync(creds.password, user.password)) {
+        // login is successful
+        // create the token
+        const token = generateToken(user);
+
+        res.status(200).json({ message: `${user.username}`, token });
+      } else {
+        res.status(401).json({ you: 'shall not pass!!' });
+      }
+    })
+    .catch(err => res.status(500).json(err));
+}
