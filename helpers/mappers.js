@@ -2,7 +2,7 @@ module.exports = {
   intToBoolean,
   booleanToint,
   userToBody,
-  adventureToBody // s
+  tripToBody // s
 };
 
 function intToBoolean(int) {
@@ -19,20 +19,20 @@ function userToBody(user) {
     professional: intToBoolean(user.professional)
   };
 
-  if (user.adventures) {
-    result.adventures = user.adventures.map(adventure => ({
-      ...adventure,
-      professional: intToBoolean(adventure.professional)
+  if (user.trips) {
+    result.trips = user.trips.map(trip => ({
+      ...trip,
+      professional: intToBoolean(trip.professional)
     }));
   }
 
   return result;
 }
 
-function adventureToBody(adventure) {
+function tripToBody(trip) {
   //s
   return {
-    ...adventure,
-    professional: intToBoolean(adventure.professional)
+    ...trip,
+    professional: intToBoolean(trip.professional)
   };
 }
