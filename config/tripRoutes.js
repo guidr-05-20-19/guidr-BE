@@ -85,7 +85,7 @@ const updateTrip = (req, res) => {
     res
       .status(400)
       .json({
-        errorMessage: "Trip type and location are for the Trip are required."
+        errorMessage: "Trip type and location are required for the Trip."
       });
     return;
   }
